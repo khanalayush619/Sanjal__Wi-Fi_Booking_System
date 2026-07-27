@@ -3,10 +3,17 @@ const cors = require("cors");
 const { testConnection } = require("./db/pool");
 
 const app = express();
+const authRoutes = require("./routes/authRoutes");
+
+const authMiddleware = require('./middleware/authMiddleware');
+app.get('/api/protected-test', authMiddleware, (req, res) => {
+  res.json({ message: 'You are authenticated!', user: req.user });
+});
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use("/api/auth", authRoutes);
 
 // Routes
 app.get("/health", (req, res) => {
