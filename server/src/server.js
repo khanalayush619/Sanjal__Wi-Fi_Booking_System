@@ -7,6 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const locationRoutes = require("./routes/locationRoutes");
 const slotRoutes = require("./routes/slotRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
+const checkinRoutes = require("./routes/checkinRoutes");
 
 const authMiddleware = require("./middleware/authMiddleware");
 app.get("/api/protected-test", authMiddleware, (req, res) => {
@@ -20,6 +21,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/slots", slotRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/checkins", checkinRoutes);
 
 // Routes
 app.get("/health", (req, res) => {
