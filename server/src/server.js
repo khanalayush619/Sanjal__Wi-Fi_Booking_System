@@ -4,16 +4,22 @@ const { testConnection } = require("./db/pool");
 
 const app = express();
 const authRoutes = require("./routes/authRoutes");
+const locationRoutes = require("./routes/locationRoutes");
+const slotRoutes = require("./routes/slotRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
-const authMiddleware = require('./middleware/authMiddleware');
-app.get('/api/protected-test', authMiddleware, (req, res) => {
-  res.json({ message: 'You are authenticated!', user: req.user });
+const authMiddleware = require("./middleware/authMiddleware");
+app.get("/api/protected-test", authMiddleware, (req, res) => {
+  res.json({ message: "You are authenticated!", user: req.user });
 });
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
+app.use("/api/locations", locationRoutes);
+app.use("/api/slots", slotRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 // Routes
 app.get("/health", (req, res) => {
