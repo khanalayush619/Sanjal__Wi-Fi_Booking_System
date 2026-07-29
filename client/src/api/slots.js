@@ -11,3 +11,8 @@ export async function getSlotAvailability(slotId, date) {
   });
   return response.data;
 }
+
+export async function getAllSlots() {
+  const response = await api.get("/slots");
+  return response.data.slots;
+}
