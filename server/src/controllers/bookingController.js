@@ -97,12 +97,9 @@ async function createBooking(req, res) {
 
     if (locationUsed + device_count > slot.device_capacity) {
       await client.query("ROLLBACK");
-      return res
-        .status(409)
-        .json({
-          error:
-            "This location does not have enough capacity left at that time.",
-        });
+      return res.status(409).json({
+        error: "This location does not have enough capacity left at that time.",
+      });
     }
 
     // Build code validity window from booking_date + slot's time-of-day
@@ -140,4 +137,28 @@ async function createBooking(req, res) {
   }
 }
 
-module.exports = { createBooking };
+async function getMyBookings(req, res) {
+  const userId = req.user.id;
+
+  try {
+    const result = await pool.query(
+      `SELECT b.id, b.access_code, b.booking_date, b.device_count, b.status,
+              b.code_valid_from, b.code_valid_until,
+              s.start_time, s.end_time,
+              l.name AS location_name
+       FROM bookings b
+       JOIN wifi_slots s ON b.slot_id = s.id
+       JOIN locations l ON s.location_id = l.id
+       WHERE b.user_id = $1
+       ORDER BY b.booking_date DESC, s.start_time DESC`,
+      [userId],
+    );
+
+    return res.status(200).json({ bookings: result.rows });
+  } catch (err) {
+    console.error("Get my bookings error:", err.message);
+    return res.status(500).json({ error: "Something went wrong." });
+  }
+}
+
+module.exports = { createBooking, getMyBookings };
