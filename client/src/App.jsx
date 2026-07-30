@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Bookings from "./pages/Bookings";
 import History from "./pages/History";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -28,9 +29,10 @@ function App() {
               }
             >
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/bookings" element={<Bookings />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/admin" element={<Admin />} />
             </Route>
-            <Route path="/bookings" element={<Bookings />} />
-            <Route path="/history" element={<History />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

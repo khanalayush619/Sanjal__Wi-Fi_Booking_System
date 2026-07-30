@@ -9,6 +9,7 @@ function Layout() {
     { path: "/dashboard", label: "Dashboard" },
     { path: "/bookings", label: "Bookings" },
     { path: "/history", label: "History" },
+    ...(user?.role === "staff" ? [{ path: "/admin", label: "Admin" }] : []),
   ];
 
   return (
