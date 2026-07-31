@@ -8,9 +8,11 @@ async function getSlotsByLocation(req, res) {
       `SELECT id, start_time, end_time, max_devices, location_id
        FROM wifi_slots
        WHERE location_id = $1
+         AND is_active = TRUE
        ORDER BY start_time`,
       [locationId],
     );
+
     return res.status(200).json({ slots: result.rows });
   } catch (err) {
     console.error("Get slots error:", err.message);
@@ -34,7 +36,8 @@ async function getSlotAvailability(req, res) {
               l.device_capacity
        FROM wifi_slots s
        JOIN locations l ON s.location_id = l.id
-       WHERE s.id = $1`,
+       WHERE s.id = $1
+       AND s.is_active = TRUE`,
       [slotId],
     );
 
@@ -76,23 +79,28 @@ async function getSlotAvailability(req, res) {
 }
 
 async function getAllSlotsWithAvailability(req, res) {
-  const today = new Date().toISOString().split("T")[0];
+  const { date } = req.query;
+
+  const selectedDate = date || new Date().toISOString().split("T")[0];
 
   try {
     const result = await pool.query(
       `SELECT s.id, s.start_time, s.end_time, s.max_devices, s.location_id,
-              l.name AS location_name, l.device_capacity,
-              COALESCE(booked.total, 0) AS booked_devices
-       FROM wifi_slots s
-       JOIN locations l ON s.location_id = l.id
-       LEFT JOIN (
-         SELECT slot_id, SUM(device_count) AS total
-         FROM bookings
-         WHERE booking_date = $1 AND status = 'confirmed'
-         GROUP BY slot_id
-       ) booked ON booked.slot_id = s.id
-       ORDER BY l.name, s.start_time`,
-      [today],
+          l.name AS location_name, l.device_capacity,
+          COALESCE(booked.total, 0) AS booked_devices
+   FROM wifi_slots s
+   JOIN locations l ON s.location_id = l.id
+   LEFT JOIN (
+     SELECT slot_id, SUM(device_count) AS total
+     FROM bookings
+     WHERE booking_date = $1
+       AND status = 'confirmed'
+     GROUP BY slot_id
+   ) booked
+   ON booked.slot_id = s.id
+   WHERE s.is_active = TRUE
+   ORDER BY l.name, s.start_time`,
+      [selectedDate],
     );
 
     const slots = result.rows.map((row) => ({

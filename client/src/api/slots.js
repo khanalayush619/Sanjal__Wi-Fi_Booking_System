@@ -12,7 +12,10 @@ export async function getSlotAvailability(slotId, date) {
   return response.data;
 }
 
-export async function getAllSlots() {
-  const response = await api.get("/slots");
+export async function getAllSlots(date) {
+  const response = await api.get("/slots", {
+    params: { date },
+  });
+
   return response.data.slots;
 }

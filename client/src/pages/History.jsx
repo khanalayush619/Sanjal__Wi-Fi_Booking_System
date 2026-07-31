@@ -44,6 +44,9 @@ function History() {
     );
 
   const totalBookings = bookings.length;
+  const confirmedCount = bookings.filter(
+    (b) => b.status === "confirmed",
+  ).length;
   const avgDevices = totalBookings
     ? (
         bookings.reduce((sum, b) => sum + b.device_count, 0) / totalBookings
@@ -57,7 +60,7 @@ function History() {
       </h1>
       <p className="text-gray-500 mb-6">Review your past Wi-Fi bookings.</p>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-white border rounded-xl p-5">
           <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
             Total Bookings
@@ -66,7 +69,13 @@ function History() {
         </div>
         <div className="bg-white border rounded-xl p-5">
           <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
-            Avg Devices / Booking
+            Confirmed
+          </p>
+          <p className="text-2xl font-bold">{confirmedCount}</p>
+        </div>
+        <div className="bg-white border rounded-xl p-5">
+          <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
+            Avg Devices
           </p>
           <p className="text-2xl font-bold">{avgDevices}</p>
         </div>

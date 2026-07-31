@@ -1,3 +1,6 @@
+const cron = require("node-cron");
+const expireBookings = require("./jobs/bookingExpiryJob");
+
 const express = require("express");
 const cors = require("cors");
 const { testConnection } = require("./db/pool");
@@ -52,5 +55,11 @@ async function start() {
 }
 
 start();
+
+cron.schedule("* * * * *", async () => {
+  console.log("Checking expired bookings...");
+
+  await expireBookings();
+});
 
 module.exports = app;

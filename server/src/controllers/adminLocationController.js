@@ -33,9 +33,17 @@ async function createLocation(req, res) {
 async function deleteLocation(req, res) {
   const { id } = req.params;
   try {
-    await pool.query("DELETE FROM wifi_slots WHERE location_id = $1", [id]);
+    await pool.query(
+      `UPDATE wifi_slots
+   SET is_active = FALSE
+   WHERE location_id = $1`,
+      [id],
+    );
     const result = await pool.query(
-      "DELETE FROM locations WHERE id = $1 RETURNING id",
+      `UPDATE locations
+   SET is_active = FALSE
+   WHERE id = $1
+   RETURNING id`,
       [id],
     );
     if (result.rows.length === 0) {
@@ -97,20 +105,31 @@ async function createSlot(req, res) {
 
 async function deleteSlot(req, res) {
   const { id } = req.params;
+
   try {
     const result = await pool.query(
-      "DELETE FROM wifi_slots WHERE id = $1 RETURNING id",
+      `UPDATE wifi_slots
+       SET is_active = FALSE
+       WHERE id = $1
+       RETURNING id`,
       [id],
     );
+
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Slot not found." });
+      return res.status(404).json({
+        error: "Slot not found.",
+      });
     }
-    return res.status(200).json({ message: "Slot deleted." });
+
+    return res.status(200).json({
+      message: "Slot deactivated successfully.",
+    });
   } catch (err) {
     console.error("Delete slot error:", err.message);
-    return res
-      .status(500)
-      .json({ error: "Something went wrong. It may have active bookings." });
+
+    return res.status(500).json({
+      error: "Something went wrong.",
+    });
   }
 }
 
